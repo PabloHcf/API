@@ -1,0 +1,102 @@
+mkdir api-itens
+cd api-itens
+npm init -y
+npm install express
+node server.js
+node -v
+npm -v
+echo const express = require('express'); > server.js
+const express = require('express');
+const app = express();
+const port = 3000;
+
+// Usar JSON como formato de resposta
+app.use(express.json());
+
+// Banco de dados fictício (em memória)
+let itens = [
+  { id: 1, nome: "Produto 1", preco: 100.0 },
+  { id: 2, nome: "Produto 2", preco: 150.0 }
+];
+
+// Rota GET para listar todos os itens
+app.get('/itens', (req, res) => {
+  res.status(200).json(itens);
+});
+
+// Rota POST para adicionar um novo item
+app.post('/itens', (req, res) => {
+  const { nome, preco } = req.body;
+  if (!nome || !preco) {
+    return res.status(400).json({ erro: "Nome e preço são obrigatórios" });
+  }
+
+  const novoItem = {
+    id: itens.length + 1,
+    nome,
+    preco
+  };
+
+  itens.push(novoItem);
+  res.status(201).json(novoItem);
+});
+
+// Rota PUT para atualizar um item existente
+app.put('/itens/:id', (req, res) => {
+  const itemId = parseInt(req.params.id);
+  const { nome, preco } = req.body;
+  const item = itens.find(i => i.id === itemId);
+
+  if (!item) {
+    return res.status(404).json({ erro: "Item não encontrado" });
+  }
+
+  item.nome = nome || item.nome;
+  item.preco = preco || item.preco;
+
+  res.status(200).json(item);
+});
+
+// Rota DELETE para excluir um item
+app.delete('/itens/:id', (req, res) => {
+  const itemId = parseInt(req.params.id);
+  const itemIndex = itens.findIndex(i => i.id === itemId);
+
+  if (itemIndex === -1) {
+    return res.status(404).json({ erro: "Item não encontrado" });
+  }
+
+  itens.splice(itemIndex, 1);
+  res.status(200).json({ mensagem: "Item excluído com sucesso" });
+});
+
+// Inicia o servidor
+app.listen(port, () => {
+  console.log(`API rodando em http://localhost:${port}`);
+});
+node server.js
+# API de Itens
+
+Esta API permite gerenciar uma coleção de itens com as funcionalidades básicas de listagem, criação, atualização e exclusão.
+
+## Endpoints
+
+### 1. **GET /itens**
+- Retorna todos os itens.
+- **Exemplo de resposta**:
+  ```json
+  [
+    { "id": 1, "nome": "Produto 1", "preco": 100.0 },
+    { "id": 2, "nome": "Produto 2", "preco": 150.0 }
+  ]
+{
+  "nome": "Produto 3",
+  "preco": 200.0
+}
+{
+  "nome": "Produto 1 Atualizado",
+  "preco": 120.0
+}
+{
+  "mensagem": "Item excluído com sucesso"
+}
